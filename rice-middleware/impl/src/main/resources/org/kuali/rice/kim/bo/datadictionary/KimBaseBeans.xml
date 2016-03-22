@@ -62,7 +62,7 @@
         p:required="true" >
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="false"/>
-      <!--  <bean parent="AlphaNumericValidationPattern" p:lowerCase="true" p:allowPeriod="true"/>   -->
+      <!--  <bean parent="AlphaNumericValidationPattern" p:lowerCase="true" p:allowPeriod="true"/>    -->
     </property>
     <property name="control" >
       <bean parent="TextControlDefinition" p:size="10" />
