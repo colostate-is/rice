@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ public class TravelExpenseItem extends DataObjectBase implements Serializable {
 
     private static final long serialVersionUID = -4092206384418712220L;
 
-    @Id @Column(name = "EXP_ITM_ID", length = 10)
+    @Id
+    @Column(name = "EXP_ITM_ID", length = 10)
     @GeneratedValue(generator = "TRVL_EXP_ITM_ID_S")
     @PortableSequenceGenerator(name = "TRVL_EXP_ITM_ID_S")
     @Label("Id")

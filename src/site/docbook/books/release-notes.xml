@@ -27,7 +27,30 @@ limitations under the License.
     <para>Welcome to Rice ${project.version}! </para>
     <section>
       <title>Release Highlights</title>
-      <para>This release consists of a single security fix. There are no database changes and it should be a drop-in replacement.</para>
+      <para>This release consists of a number of security fixes to both the KNS as well as KRAD, including the following:</para>
+      <para><itemizedlist>
+        <listitem>
+          <para>Cross-Site Request Forgery (CSRF) protection added to the KNS</para>
+        </listitem>
+        <listitem>
+          <para>Cross-Site Request Forgery (CSRF) protection added to the KRAD platform</para>
+        </listitem>
+        <listitem>
+          <para>Fixed a number of XSS vulnerabilities in the KNS and KRAD</para>
+        </listitem>
+        <listitem>
+          <para>Upgraded commons-fileupload to version 1.3.2</para>
+        </listitem>
+      </itemizedlist>
+      </para>
+      <para>Depending on your use of the KNS and/or KRAD this may be a drop-in replacement. However see below for
+        information on potential impact related to the CSRF implementation.
+      </para>
+      <para>You will also want to be sure that if you
+        have established dependencies in your own project to commons-fileupload that you upgrade those as well.
+        The specific vulnerability in commons-fileupload is detailed here:
+        <link xlink:href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3092">http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3092</link>
+      </para>
     </section>
     <section>
       <title>Download</title>
@@ -56,15 +79,34 @@ limitations under the License.
         Please indicate that you are using the ${project.version} version of Rice.</para>
     </section>
   </section>
-  <section xml:id="items_addressed_in_rice">
-    <title>Items Addressed in Rice ${project.version}</title>
 
-
-    <section><title>        Bug Fix
-    </title>
-      <para><itemizedlist>        
-        <listitem><para>[<link xlink:href='https://jira.kuali.org/browse/KULRICE-14278'>KULRICE-14278</link>] - Update commons-collections to latest</para></listitem>
-      </itemizedlist></para>
+  <section xml:id="impacting_changes">
+    <title>Impacting Changes</title>
+    <section>
+      <title>CSRF Protection for KNS Applications</title>
+      <para>This release implements CSRF protection within the KNS. For most standard uses of the framework, no action
+      will be required since the fix for this issue has been incorporated into the KNS's <code>page.tag</code> library.
+      However, if you are using the KNS with custom JSP pages or HTML and have custom <code>&lt;form&gt;</code> elements
+      then you will need to ensure that you are submitting a hidden form input field that contains the CSRF token.</para>
+      <para>The CSRF token is stored in the session in an attribute called <code>csrfSessionToken</code>. There is a
+      new TAG library in the set of KNS tags called "csrf" which will insert the hidden form field and can be used as
+      follows:</para>
+      <programlisting>&lt;kul:csrf/&gt;</programlisting>
+      <para>This simply resolves to the following HTML:</para>
+      <programlisting>&lt;input type="hidden" name="csrfToken" value="${sessionScope.csrfSessionToken}"/&gt;</programlisting>
+    </section>
+    <section>
+      <title>CSRF Protection for KRAD Applications</title>
+      <para>This release implements CSRF protection within KRAD. For most standard uses of the framework, no action
+        will be required since the fix for this issue has been incorporated into KRAD's standard <code>form.ftl</code>
+        freemarker template. However, if you are using KRAD with custom freemarker pages and creating forms without
+        using the supplied KRAD UIF form component, then you will need to ensure that you are submitting a hidden form
+        input field that contains the CSRF token.</para>
+      <para>In order to do this, a custom freemarker template has been implemented that will insert the CSRF form field
+        for you. It can be used as follows:</para>
+      <programlisting>&lt;@krad.csrfToken/&gt;</programlisting>
+      <para>This simply resolves to the following:</para>
+      <programlisting>&lt;input type="hidden" name="csrfToken" value="${KualiForm.csrfToken!}"/&gt;</programlisting>
     </section>
   </section>
 </article>

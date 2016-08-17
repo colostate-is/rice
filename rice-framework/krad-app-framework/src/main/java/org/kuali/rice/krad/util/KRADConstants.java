@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,6 +194,8 @@ public final class KRADConstants {
     public static final String LOGOFF_REDIRECT_URL_PARAMETER = "LOGOFF_REDIRECT_URL";
     public static final String LOGOFF_REDIRECT_URL_PROPERTY = "rice.portal.logout.redirectUrl";
     public static final String PORTAL_ALLOWED_REGEX = "rice.portal.allowed.regex";
+    public static final String BACK_LOCATION_ALLOWED_REGEX = "rice.backLocation.allowed.regex";
+    public static final String BACK_LOCATION_DEFAULT_URL = "rice.backLocation.default.url";
     //    public static final String BLANKET_APPROVE_METHOD = "blanketApprove";
     public static final String BUSINESS_OBJECT_CLASS_ATTRIBUTE = "businessObjectClassName";
     public static final String DATA_OBJECT_CLASS_ATTRIBUTE = "dataObjectClassName";

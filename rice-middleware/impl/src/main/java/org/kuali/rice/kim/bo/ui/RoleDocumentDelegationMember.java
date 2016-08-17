@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,23 @@
  */
 package org.kuali.rice.kim.bo.ui;
 
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.persistence.annotations.JoinFetch;
+import org.eclipse.persistence.annotations.JoinFetchType;
+import org.kuali.rice.core.api.delegation.DelegationType;
+import org.kuali.rice.core.api.membership.MemberType;
+import org.kuali.rice.kim.api.KimConstants;
+import org.kuali.rice.kim.api.group.Group;
+import org.kuali.rice.kim.api.role.Role;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
+import org.kuali.rice.kim.impl.role.RoleBo;
+import org.kuali.rice.kim.impl.role.RoleMemberBo;
+import org.kuali.rice.kim.impl.type.KimTypeAttributesHelper;
+import org.kuali.rice.kim.impl.type.KimTypeBo;
+import org.kuali.rice.kim.service.KIMServiceLocatorInternal;
+import org.kuali.rice.kim.service.UiDocumentService;
+import org.kuali.rice.krad.data.jpa.PortableSequenceGenerator;
+import org.springframework.util.AutoPopulatingList;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,21 +43,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.persistence.annotations.JoinFetch;
-import org.eclipse.persistence.annotations.JoinFetchType;
-import org.kuali.rice.core.api.delegation.DelegationType;
-import org.kuali.rice.core.api.membership.MemberType;
-import org.kuali.rice.kim.api.KimConstants;
-import org.kuali.rice.kim.api.group.Group;
-import org.kuali.rice.kim.api.role.Role;
-import org.kuali.rice.kim.api.services.KimApiServiceLocator;
-import org.kuali.rice.kim.impl.role.RoleBo;
-import org.kuali.rice.kim.impl.type.KimTypeAttributesHelper;
-import org.kuali.rice.kim.impl.type.KimTypeBo;
-import org.kuali.rice.krad.data.jpa.PortableSequenceGenerator;
-import org.springframework.util.AutoPopulatingList;
+import java.util.List;
 
 /**
  * 
@@ -98,14 +100,27 @@ public class RoleDocumentDelegationMember extends KimDocumentBoActivatableToFrom
     protected String memberName;
 
     @JoinFetch(value= JoinFetchType.OUTER)
-    @OneToMany(targetEntity = RoleDocumentDelegationMemberQualifier.class, orphanRemoval = true, cascade = { CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.PERSIST })
+    @OneToMany(targetEntity = RoleDocumentDelegationMemberQualifier.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumns({ 
-        @JoinColumn(name = "FDOC_NBR", referencedColumnName = "FDOC_NBR", insertable = false, updatable = false), 
-        @JoinColumn(name = "DLGN_MBR_ID", referencedColumnName = "DLGN_MBR_ID", insertable = false, updatable = false) })
+        @JoinColumn(name = "FDOC_NBR", referencedColumnName = "FDOC_NBR"),
+        @JoinColumn(name = "DLGN_MBR_ID", referencedColumnName = "DLGN_MBR_ID") })
     protected List<RoleDocumentDelegationMemberQualifier> qualifiers = new AutoPopulatingList<RoleDocumentDelegationMemberQualifier>(RoleDocumentDelegationMemberQualifier.class);
 
     @Transient
     protected String delegationTypeCode;
+
+    public void loadTransientRoleFields() {
+        if ((getRoleBo() == null || getRoleBo().getId() == null) && getRoleMemberId() != null) {
+            UiDocumentService uiDocumentService = KIMServiceLocatorInternal.getUiDocumentService();
+            RoleMemberBo roleMember = uiDocumentService.getRoleMember(getRoleMemberId());
+            setRoleMemberMemberId(roleMember.getMemberId());
+            setRoleMemberMemberTypeCode(roleMember.getType().getCode());
+            setRoleMemberName(uiDocumentService.getMemberName(MemberType.fromCode(getRoleMemberMemberTypeCode()), getRoleMemberMemberId()));
+            setRoleMemberNamespaceCode(uiDocumentService.getMemberNamespaceCode(MemberType.fromCode(getRoleMemberMemberTypeCode()), getRoleMemberMemberId()));
+            Role role = KimApiServiceLocator.getRoleService().getRole(roleMember.getRoleId());
+            setRoleBo(RoleBo.from(role));
+        }
+    }
 
     public String getDelegationTypeCode() {
         return this.delegationTypeCode;

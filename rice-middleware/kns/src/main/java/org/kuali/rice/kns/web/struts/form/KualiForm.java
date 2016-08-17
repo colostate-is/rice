@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,18 @@
  */
 package org.kuali.rice.kns.web.struts.form;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMapping;
-import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.core.web.format.Formatter;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kns.datadictionary.HeaderNavigation;
 import org.kuali.rice.kns.util.ActionFormUtilMap;
 import org.kuali.rice.kns.util.WebUtils;
@@ -28,13 +36,6 @@ import org.kuali.rice.kns.web.ui.HeaderField;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.springframework.util.AutoPopulatingList;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class common properites for all action forms.
@@ -484,7 +485,7 @@ public class KualiForm extends PojoFormBase {
 	 * @return the backLocation
 	 */
 	public String getBackLocation() {
-		return this.backLocation;
+		return WebUtils.sanitizeBackLocation(this.backLocation);
 	}
 
 	/**

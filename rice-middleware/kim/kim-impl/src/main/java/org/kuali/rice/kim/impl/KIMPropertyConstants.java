@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,7 @@ public final class KIMPropertyConstants {
 	public static final class Delegation {
 		public static final String ROLE_ID = "roleId";
 		public static final String DELEGATION_ID = "delegationId";
+		public static final String DELEGATION_TYPE_CODE = "delegationTypeCode";
 		public static final String ACTIVE = KRADPropertyConstants.ACTIVE;
 		
 		private Delegation() {

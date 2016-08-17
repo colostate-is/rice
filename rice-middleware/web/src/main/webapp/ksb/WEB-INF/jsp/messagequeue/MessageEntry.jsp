@@ -1,6 +1,6 @@
 <%--
 
-    Copyright 2005-2015 The Kuali Foundation
+    Copyright 2005-2016 The Kuali Foundation
 
     Licensed under the Educational Community License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 
-
 <html>
   <head>
     <title>Message Entry</title>
@@ -34,6 +33,7 @@
   <body>
 
     <html-el:form action="/MessageQueue.do">
+		<kul:csrf />
     <html-el:hidden name="MessageQueueForm" property="methodToCall" />
     <html-el:hidden name="MessageQueueForm" property="showEdit" />
     <html-el:hidden name="MessageQueueForm" property="messageId" />

@@ -15,8 +15,8 @@
 ====
 
 README.txt
-Kuali Rice ${project.version}
-${readme.build.timestamp}
+Kuali Rice 2.5.12
+August 1, 2016
 
 
 Contents
