@@ -1,0 +1,84 @@
+From 3327b23106bf6d66e972adea573bff99d4eb34df Mon Sep 17 00:00:00 2001
+From: tfoxley <travisfoxley@gmail.com>
+Date: Mon, 15 Aug 2016 13:38:32 -0600
+Subject: [PATCH] FINI-2345 move csrf exempt paths out to configuration file
+
+---
+ .../main/resources/kfs-default-config.properties   |  1 +
+ .../java/org/kuali/kfs/kns/util/KNSConstants.java  |  1 +
+ .../web/struts/action/KualiRequestProcessor.java   | 22 +++++++++++++++++++++-
+ 3 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/kfs-core/src/main/resources/kfs-default-config.properties b/kfs-core/src/main/resources/kfs-default-config.properties
+index 8d91e0d..7fa96b2 100644
+--- a/kfs-core/src/main/resources/kfs-default-config.properties
++++ b/kfs-core/src/main/resources/kfs-default-config.properties
+@@ -172,3 +172,4 @@ login.filter.param.loginUser=khuntley
+ 
+ apis.enabled=false
+ jwt.expiration.seconds=86400
++csrf.exempt.paths=
+diff --git a/kfs-kns/src/main/java/org/kuali/kfs/kns/util/KNSConstants.java b/kfs-kns/src/main/java/org/kuali/kfs/kns/util/KNSConstants.java
+index 7f669b8..738e4c1 100644
+--- a/kfs-kns/src/main/java/org/kuali/kfs/kns/util/KNSConstants.java
++++ b/kfs-kns/src/main/java/org/kuali/kfs/kns/util/KNSConstants.java
+@@ -22,4 +22,5 @@
+ public class KNSConstants {
+     public static final String AUDIT_ERRORS = "AuditErrors";
+     public static final String EXCEPTION_ON_MISSING_FIELD_CONVERSION_ATTRIBUTE = "rice.kns.exceptionOnMissingFieldConversionAttribute";
++    public static final String CSRF_EXEMPT_PATHS = "csrf.exempt.paths";
+ }
+diff --git a/kfs-kns/src/main/java/org/kuali/kfs/kns/web/struts/action/KualiRequestProcessor.java b/kfs-kns/src/main/java/org/kuali/kfs/kns/web/struts/action/KualiRequestProcessor.java
+index 313f09e..b086ae8 100644
+--- a/kfs-kns/src/main/java/org/kuali/kfs/kns/web/struts/action/KualiRequestProcessor.java
++++ b/kfs-kns/src/main/java/org/kuali/kfs/kns/web/struts/action/KualiRequestProcessor.java
+@@ -85,6 +85,7 @@
+ 
+ 	private SessionDocumentService sessionDocumentService;
+ 	private PlatformTransactionManager transactionManager;
++	private ConfigurationService configurationService;
+ 	
+     public void process(final HttpServletRequest request,
+             final HttpServletResponse response) throws IOException, ServletException {
+@@ -229,7 +230,7 @@ public void processFormActionAndForward(final HttpServletRequest request, final
+ 		// need to make sure that we don't check CSRF until after the form is populated so that Struts will parse the
+ 		// multipart parameters into the request if it's a multipart request
+ 		LOG.debug("context path = "+request.getRequestURI());
+-		if (!request.getRequestURI().contains("b2b.do") && !CsrfValidator.validateCsrf(request, response)) {
++		if (!isCsrfExemptPath(request.getRequestURI()) && !CsrfValidator.validateCsrf(request, response)) {
+ 			LOG.error("Did not pass CSRF validation");
+ 			return;
+ 		}
+@@ -252,6 +253,17 @@ public void processFormActionAndForward(final HttpServletRequest request, final
+         }
+     }
+ 
++	private boolean isCsrfExemptPath(String requestUri) {
++		String exemptPathsString = getConfigurationService().getPropertyValueAsString(KNSConstants.CSRF_EXEMPT_PATHS);
++		for (String path : exemptPathsString.split(",")) {
++			if (requestUri.contains(path)) {
++				return true;
++			}
++		}
++
++		return false;
++	}
++
+ 
+ 	/**
+ 	 * This method gets the document number from the request.  The request should have been processed already 
+@@ -751,6 +763,14 @@ public PlatformTransactionManager getTransactionManager() {
+ 		}
+ 		return this.transactionManager;
+ 	}
++
++	public ConfigurationService getConfigurationService() {
++		if (configurationService == null) {
++			configurationService = KRADServiceLocator.getKualiConfigurationService();
++		}
++
++		return configurationService;
++	}
+ 	
+ 	private ActionForm createNewActionForm(ActionMapping mapping, HttpServletRequest request) {
+         String name = mapping.getName();
