@@ -329,6 +329,9 @@ public class BusinessObjectDaoOjb extends PlatformAwareDaoBaseOjb implements Bus
             Object value = e.getValue();
             if (value instanceof Collection) {
                 criteria.addIn(key, (Collection) value);
+            } else if(value instanceof String && ((String)value).contains("*")){
+                value = ((String)value).replace("*","%");
+                criteria.addLike(key,value);
             } else {
                 criteria.addEqualTo(key, value);
             }
@@ -337,6 +340,9 @@ public class BusinessObjectDaoOjb extends PlatformAwareDaoBaseOjb implements Bus
         return criteria;
     }
 
+
+    
+    
     
     private <T extends BusinessObject> Criteria buildCriteria(Class<T> clazz, Object primaryKey) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kuali.rice.krad.labs.sessionPolicy;
+package org.kuali.rice.krad.labs.sessionpolicy;
 
 import org.kuali.rice.krad.labs.KradLabsController;
 import org.kuali.rice.krad.labs.KradLabsForm;
