@@ -321,6 +321,7 @@ public class BusinessObjectDaoOjb extends PlatformAwareDaoBaseOjb implements Bus
      * @return
      */
     private Criteria buildCriteria(Map<String, ?> fieldValues) {
+	    System.out.println("\n\nbuildCriteria\n\n");
         Criteria criteria = new Criteria();
         for (Iterator i = fieldValues.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String, Object> e = (Map.Entry<String, Object>) i.next();
