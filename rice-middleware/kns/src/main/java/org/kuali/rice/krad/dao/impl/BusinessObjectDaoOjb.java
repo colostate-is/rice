@@ -330,6 +330,7 @@ public class BusinessObjectDaoOjb extends PlatformAwareDaoBaseOjb implements Bus
             if (value instanceof Collection) {
                 criteria.addIn(key, (Collection) value);
             } else if(value instanceof String && ((String)value).contains("*")){
+		    System.out.println("**************\n\n"+value+"\n\n*****************");
                 value = ((String)value).replace("*","%");
                 criteria.addLike(key,value);
             } else {
