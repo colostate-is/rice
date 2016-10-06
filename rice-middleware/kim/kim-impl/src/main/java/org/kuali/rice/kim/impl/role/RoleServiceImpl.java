@@ -600,7 +600,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
 
     @Override
     public boolean principalHasRole(String principalId, List<String> roleIds, Map<String, String> qualification) throws RiceIllegalStateException {
-
+System.out.println("\n\n\nHELLO\n\n\n");
         if ( LOG.isDebugEnabled() ) {
             logPrincipalHasRoleCheck(principalId, roleIds, qualification);
         }
