@@ -87,7 +87,7 @@ import java.util.Set;
 import static org.kuali.rice.core.api.criteria.PredicateFactory.equal;
 
 public class RoleServiceImpl extends RoleServiceBase implements RoleService {
-    private static final Logger LOG = Logger.getLogger(RoleServiceImpl.class);
+    private static final jdk.internal.instrumentation.Logger LOG = Logger.getLogger(RoleServiceImpl.class);
 
     private static final Map<String, RoleDaoAction> memberTypeToRoleDaoActionMap = populateMemberTypeToRoleDaoActionMap();
 
@@ -1173,7 +1173,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
         try {
             // Phase 1: first check if any of the role membership is cached, only proceed with checking the role ids that
             // aren't already cached
-
+            LOG.debug("Phase1");
             List<String> roleIdsToCheck = new ArrayList<String>(roleIds.size());
             for (String roleId : roleIds) {
                 Boolean hasRole = getPrincipalHasRoleFromCache(principalId, roleId, qualification, checkDelegations);
@@ -1185,17 +1185,19 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                     roleIdsToCheck.add(roleId);
                 }
             }
+            LOG.debug("roleIdsToCheck: " + roleIdsToCheck);
 
             // load the roles, this will also filter out inactive roles!
             List<Role> roles = loadRoles(roleIdsToCheck);
             // short-circuit if no roles match
             if (roles.isEmpty()) {
+                LOG.debug("loadRoles returned empty, returning false");
                 return false;
             }
 
             // Phase 2: If they didn't pass any qualifications or they are using exact qualifier matching, we can go
             // straight to the database
-
+            LOG.debug("Phase 2");
             Set<String> rolesCheckedForExactMatch = new HashSet<String>();
             for (Role role : roles) {
                 Map<String, String> qualificationForExactMatch = null;
@@ -1220,8 +1222,10 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                     rolesCheckedForExactMatch.add(role.getId());
                     List<RoleMemberBo> matchingRoleMembers = getStoredRolePrincipalsForPrincipalIdAndRoleIds(
                             Collections.singletonList(role.getId()), principalId, qualificationForExactMatch);
+                    LOG.debug("matchingRoleMembers: " + matchingRoleMembers);
                     // if a role member matched our principal, we're good to go
                     if (CollectionUtils.isNotEmpty(matchingRoleMembers)) {
+                        LOG.debug("returning putPrincipalHasRoleInCache");
                         return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                     }
                     // now check groups
@@ -1229,6 +1233,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                         List<RoleMemberBo> matchingRoleGroupMembers =
                                 getStoredRoleGroupsUsingExactMatchOnQualification(context.getPrincipalGroupIds(), role.getId(), qualification);
                         if (CollectionUtils.isNotEmpty(matchingRoleGroupMembers)) {
+                            LOG.debug("returning putPrincipalHasRoleInCache (group check)");
                             return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                         }
                     }
@@ -1239,16 +1244,20 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
 
             // Phase 3: If we couldn't do an exact match, we need to work with the RoleTypeService in order to
             // perform matching
-
+            LOG.debug("Phase 3");
             for (Role role : roles) {
                 // if we didn't do an exact match, we need to do a manual match
                 if (!rolesCheckedForExactMatch.contains(role.getId())) {
                     List<RoleMemberBo> matchingPrincipalRoleMembers = getRoleMembersForPrincipalId(Collections.singletonList(role.getId()), principalId);
                     List<RoleMemberBo> matchingGroupRoleMembers = getRoleMembersForGroupIds(role.getId(), context.getPrincipalGroupIds());
                     List<RoleMembership> roleMemberships = convertToRoleMemberships(matchingPrincipalRoleMembers, matchingGroupRoleMembers);
+                    LOG.debug("matchingPrincipalRoleMembers: " + matchingPrincipalRoleMembers);
+                    LOG.debug("matchingGroupRoleMembers: " + matchingGroupRoleMembers);
+                    LOG.debug("roleMemberships: " + roleMemberships);
                     try {
                         RoleTypeService roleTypeService = context.getRoleTypeService(role.getKimTypeId());
                         if (roleTypeService != null && !roleTypeService.getMatchingRoleMemberships(qualification, roleMemberships).isEmpty()) {
+                            LOG.debug("returning putPrincipalHasRoleInCache (phase 3)");
                             return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                         }
                     } catch (Exception ex) {
@@ -1258,7 +1267,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
             }
 
             // Phase 4: If we have nested roles, execute a recursive check on those
-
+            LOG.debug("Phase 4");
             // first, check that the qualifiers on the role membership match
             // then, perform a principalHasRole on the embedded role
             Map<String, Role> roleIndex = new HashMap<String, Role>();
@@ -1267,6 +1276,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
             }
             List<RoleMemberBo> roleMemberBos = getStoredRoleMembersForRoleIds(new ArrayList<String>(roleIndex.keySet()),
                     MemberType.ROLE.getCode(), null);
+            LOG.debug("roleMemberBos: " + roleMemberBos);
             for (RoleMemberBo roleMemberBo : roleMemberBos) {
                 Role role = roleIndex.get(roleMemberBo.getRoleId());
                 VersionedService<RoleTypeService> roleTypeService = context.getVersionedRoleTypeService(role.getKimTypeId());
@@ -1283,6 +1293,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                                             qualification, roleMemberBo.getAttributes());
                             if (principalHasRole(context, principalId,
                                     Collections.singletonList(roleMemberBo.getMemberId()), nestedRoleQualification, true)) {
+                                LOG.debug("returning putPrincipalHasRoleInCache (phase 4)");
                                 return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                             }
                         }
@@ -1295,6 +1306,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                     // no role type service, so can't convert qualification - just pass as is
                     if (principalHasRole(context, principalId, Collections.singletonList(roleMemberBo.getMemberId()),
                             qualification, true)) {
+                        LOG.debug("returning putPrincipalHasRoleInCache (phase 4, part 2)");
                         return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                     }
                 }
@@ -1302,7 +1314,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
             }
 
             // Phase 5: derived roles
-
+            LOG.debug("Phase 5");
             // check for derived roles and extract principals and groups from that - then check them against the
             // role type service passing in the qualification and principal - the qualifier comes from the
             // external system (application)
@@ -1323,6 +1335,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
                         }
                     } else {
                         if(!checkDelegations) {
+                            LOG.debug("returning putPrincipalHasRoleInCache (phase 5)");
                             putPrincipalHasRoleInCache(false, principalId, role.getId(), qualification, checkDelegations);
                         }
                     }
@@ -1332,7 +1345,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
             }
 
             // Phase 6: delegations
-
+            LOG.debug("Phase 6: checkDelegatiosn=" + checkDelegations);
             if (checkDelegations) {
                 if (matchesOnDelegation(roleIndex.keySet(), principalId, context.getPrincipalGroupIds(), qualification, context)) {
                     return true;
