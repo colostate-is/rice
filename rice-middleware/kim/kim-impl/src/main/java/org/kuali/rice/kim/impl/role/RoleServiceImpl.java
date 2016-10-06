@@ -87,7 +87,7 @@ import java.util.Set;
 import static org.kuali.rice.core.api.criteria.PredicateFactory.equal;
 
 public class RoleServiceImpl extends RoleServiceBase implements RoleService {
-    private static final jdk.internal.instrumentation.Logger LOG = Logger.getLogger(RoleServiceImpl.class);
+    private static final Logger LOG = Logger.getLogger(RoleServiceImpl.class);
 
     private static final Map<String, RoleDaoAction> memberTypeToRoleDaoActionMap = populateMemberTypeToRoleDaoActionMap();
 
