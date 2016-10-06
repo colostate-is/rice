@@ -608,7 +608,7 @@ public class RoleServiceImpl extends RoleServiceBase implements RoleService {
         boolean hasRole = this.getProxiedRoleService().principalHasRole(principalId, roleIds, qualification, true);
 
         if ( LOG.isDebugEnabled() ) {
-            LOG.debug( "Result: " + hasRole );
+            LOG.debug( "xxxResult: " + hasRole );
         }
 
         return hasRole;
