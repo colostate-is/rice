@@ -1173,7 +1173,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
         try {
             // Phase 1: first check if any of the role membership is cached, only proceed with checking the role ids that
             // aren't already cached
-            LOG.debug("Phase1");
+            System.out.println("Phase1");
             List<String> roleIdsToCheck = new ArrayList<String>(roleIds.size());
             for (String roleId : roleIds) {
                 Boolean hasRole = getPrincipalHasRoleFromCache(principalId, roleId, qualification, checkDelegations);
@@ -1185,19 +1185,19 @@ System.out.println("\n\n\nHELLO\n\n\n");
                     roleIdsToCheck.add(roleId);
                 }
             }
-            LOG.debug("roleIdsToCheck: " + roleIdsToCheck);
+            System.out.println("roleIdsToCheck: " + roleIdsToCheck);
 
             // load the roles, this will also filter out inactive roles!
             List<Role> roles = loadRoles(roleIdsToCheck);
             // short-circuit if no roles match
             if (roles.isEmpty()) {
-                LOG.debug("loadRoles returned empty, returning false");
+                System.out.println("loadRoles returned empty, returning false");
                 return false;
             }
 
             // Phase 2: If they didn't pass any qualifications or they are using exact qualifier matching, we can go
             // straight to the database
-            LOG.debug("Phase 2");
+            System.out.println("Phase 2");
             Set<String> rolesCheckedForExactMatch = new HashSet<String>();
             for (Role role : roles) {
                 Map<String, String> qualificationForExactMatch = null;
@@ -1222,10 +1222,10 @@ System.out.println("\n\n\nHELLO\n\n\n");
                     rolesCheckedForExactMatch.add(role.getId());
                     List<RoleMemberBo> matchingRoleMembers = getStoredRolePrincipalsForPrincipalIdAndRoleIds(
                             Collections.singletonList(role.getId()), principalId, qualificationForExactMatch);
-                    LOG.debug("matchingRoleMembers: " + matchingRoleMembers);
+                    System.out.println("matchingRoleMembers: " + matchingRoleMembers);
                     // if a role member matched our principal, we're good to go
                     if (CollectionUtils.isNotEmpty(matchingRoleMembers)) {
-                        LOG.debug("returning putPrincipalHasRoleInCache");
+                        System.out.println("returning putPrincipalHasRoleInCache");
                         return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                     }
                     // now check groups
@@ -1233,7 +1233,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
                         List<RoleMemberBo> matchingRoleGroupMembers =
                                 getStoredRoleGroupsUsingExactMatchOnQualification(context.getPrincipalGroupIds(), role.getId(), qualification);
                         if (CollectionUtils.isNotEmpty(matchingRoleGroupMembers)) {
-                            LOG.debug("returning putPrincipalHasRoleInCache (group check)");
+                            System.out.println("returning putPrincipalHasRoleInCache (group check)");
                             return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                         }
                     }
@@ -1244,20 +1244,20 @@ System.out.println("\n\n\nHELLO\n\n\n");
 
             // Phase 3: If we couldn't do an exact match, we need to work with the RoleTypeService in order to
             // perform matching
-            LOG.debug("Phase 3");
+            System.out.println("Phase 3");
             for (Role role : roles) {
                 // if we didn't do an exact match, we need to do a manual match
                 if (!rolesCheckedForExactMatch.contains(role.getId())) {
                     List<RoleMemberBo> matchingPrincipalRoleMembers = getRoleMembersForPrincipalId(Collections.singletonList(role.getId()), principalId);
                     List<RoleMemberBo> matchingGroupRoleMembers = getRoleMembersForGroupIds(role.getId(), context.getPrincipalGroupIds());
                     List<RoleMembership> roleMemberships = convertToRoleMemberships(matchingPrincipalRoleMembers, matchingGroupRoleMembers);
-                    LOG.debug("matchingPrincipalRoleMembers: " + matchingPrincipalRoleMembers);
-                    LOG.debug("matchingGroupRoleMembers: " + matchingGroupRoleMembers);
-                    LOG.debug("roleMemberships: " + roleMemberships);
+                    System.out.println("matchingPrincipalRoleMembers: " + matchingPrincipalRoleMembers);
+                    System.out.println("matchingGroupRoleMembers: " + matchingGroupRoleMembers);
+                    System.out.println("roleMemberships: " + roleMemberships);
                     try {
                         RoleTypeService roleTypeService = context.getRoleTypeService(role.getKimTypeId());
                         if (roleTypeService != null && !roleTypeService.getMatchingRoleMemberships(qualification, roleMemberships).isEmpty()) {
-                            LOG.debug("returning putPrincipalHasRoleInCache (phase 3)");
+                            System.out.println("returning putPrincipalHasRoleInCache (phase 3)");
                             return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                         }
                     } catch (Exception ex) {
@@ -1267,7 +1267,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
             }
 
             // Phase 4: If we have nested roles, execute a recursive check on those
-            LOG.debug("Phase 4");
+            System.out.println("Phase 4");
             // first, check that the qualifiers on the role membership match
             // then, perform a principalHasRole on the embedded role
             Map<String, Role> roleIndex = new HashMap<String, Role>();
@@ -1276,7 +1276,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
             }
             List<RoleMemberBo> roleMemberBos = getStoredRoleMembersForRoleIds(new ArrayList<String>(roleIndex.keySet()),
                     MemberType.ROLE.getCode(), null);
-            LOG.debug("roleMemberBos: " + roleMemberBos);
+            System.out.println("roleMemberBos: " + roleMemberBos);
             for (RoleMemberBo roleMemberBo : roleMemberBos) {
                 Role role = roleIndex.get(roleMemberBo.getRoleId());
                 VersionedService<RoleTypeService> roleTypeService = context.getVersionedRoleTypeService(role.getKimTypeId());
@@ -1293,7 +1293,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
                                             qualification, roleMemberBo.getAttributes());
                             if (principalHasRole(context, principalId,
                                     Collections.singletonList(roleMemberBo.getMemberId()), nestedRoleQualification, true)) {
-                                LOG.debug("returning putPrincipalHasRoleInCache (phase 4)");
+                                System.out.println("returning putPrincipalHasRoleInCache (phase 4)");
                                 return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                             }
                         }
@@ -1306,7 +1306,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
                     // no role type service, so can't convert qualification - just pass as is
                     if (principalHasRole(context, principalId, Collections.singletonList(roleMemberBo.getMemberId()),
                             qualification, true)) {
-                        LOG.debug("returning putPrincipalHasRoleInCache (phase 4, part 2)");
+                        System.out.println("returning putPrincipalHasRoleInCache (phase 4, part 2)");
                         return putPrincipalHasRoleInCache(true, principalId, role.getId(), qualification, checkDelegations);
                     }
                 }
@@ -1314,7 +1314,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
             }
 
             // Phase 5: derived roles
-            LOG.debug("Phase 5");
+            System.out.println("Phase 5");
             // check for derived roles and extract principals and groups from that - then check them against the
             // role type service passing in the qualification and principal - the qualifier comes from the
             // external system (application)
@@ -1335,7 +1335,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
                         }
                     } else {
                         if(!checkDelegations) {
-                            LOG.debug("returning putPrincipalHasRoleInCache (phase 5)");
+                            System.out.println("returning putPrincipalHasRoleInCache (phase 5)");
                             putPrincipalHasRoleInCache(false, principalId, role.getId(), qualification, checkDelegations);
                         }
                     }
@@ -1345,7 +1345,7 @@ System.out.println("\n\n\nHELLO\n\n\n");
             }
 
             // Phase 6: delegations
-            LOG.debug("Phase 6: checkDelegatiosn=" + checkDelegations);
+            System.out.println("Phase 6: checkDelegatiosn=" + checkDelegations);
             if (checkDelegations) {
                 if (matchesOnDelegation(roleIndex.keySet(), principalId, context.getPrincipalGroupIds(), qualification, context)) {
                     return true;
