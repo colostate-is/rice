@@ -496,7 +496,8 @@ class NativeJpaQueryTranslator extends QueryTranslatorBase<NativeJpaQueryTransla
 				}
 			}
 		}
-		return fixedPattern.toString();
+		//return fixedPattern.toString();
+		return value;
 	}
 
     /**
