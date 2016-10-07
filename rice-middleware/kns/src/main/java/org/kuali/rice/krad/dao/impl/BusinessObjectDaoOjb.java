@@ -333,7 +333,7 @@ public class BusinessObjectDaoOjb extends PlatformAwareDaoBaseOjb implements Bus
                 criteria.addEqualTo(key, value);
             }
         }
-System.out.println("\n\nbuildCriteria: " + criteria.toQuery());
+System.out.println("\n\nbuildCriteria: " + criteria);
         return criteria;
     }
 
