@@ -496,9 +496,7 @@ class NativeJpaQueryTranslator extends QueryTranslatorBase<NativeJpaQueryTransla
 				}
 			}
 		}
-		//return fixedPattern.toString();
-		System.out.println("\n\n\nHERE\n\n");
-		return value;
+		return fixedPattern.toString();
 	}
 
     /**
