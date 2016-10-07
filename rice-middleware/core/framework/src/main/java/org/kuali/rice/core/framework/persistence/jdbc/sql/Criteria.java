@@ -243,7 +243,6 @@ public class Criteria {
 	}
 
 	private static String fixWildcards(String sIn, int startIndex, int endIndex){
-		System.out.println("\n\nHERE\n\n");
         String attribute = startIndex == -1 ? sIn : sIn.substring(startIndex+1, endIndex);
         attribute = attribute.replaceAll("\\*", "%");
 		attribute = attribute.replaceAll("\\?", "_");
