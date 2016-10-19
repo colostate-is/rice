@@ -429,7 +429,9 @@ jQuery(function(){
 </html:form>
 <div id="formComplete"></div>
 </div>
-<script type="text/javascript" src="scripts/jquery/jquery.js"></script>
+<script type="text/javascript" src="../plugins/jquery/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="../plugins/blockUI/jquery.blockUI.js"></script>
 <script type="text/javascript">
     var jq = jQuery.noConflict();
     jq(document).ready(function(){
