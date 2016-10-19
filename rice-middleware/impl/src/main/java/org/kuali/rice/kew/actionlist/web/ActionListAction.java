@@ -364,11 +364,9 @@ public class ActionListAction extends KualiAction {
                 }
             }
             // sort the action list if necessary
-System.out.println("Start sort: " + sortCriterion);            
             if (sortCriterion != null) {
                 sortActionList(actionList, sortCriterion, sortOrder);
             }
-System.out.println("Sort Done");            
 
             plog.log("calling buildCurrentPage");
             PaginatedList currentPage = buildCurrentPage(actionList, form.getCurrentPage(), form.getCurrentSort(),
@@ -521,9 +519,7 @@ System.out.println("Sort Done");
         if (SortOrderEnum.DESCENDING.equals(sortOrder)) {
             comparator = ComparatorUtils.reversedComparator(comparator);
         }
-System.out.println("Collections.sort starting");
         Collections.sort(actionList, comparator);
-System.out.println("Collections.sort done");        
 
         // re-index the action items
         int index = 0;
@@ -886,10 +882,8 @@ System.out.println("Collections.sort done");
                     return 1;
                 }
                 if (property1 instanceof Comparable) {
-System.out.println("\n\nIsComparable: property1=" + property1);                    
                     return ((Comparable)property1).compareTo(property2);
                 }
-System.out.println("\n\nNotComparable: property1=" + property1 + ", property2=" + property2);
                 return property1.toString().compareTo(property2.toString());
             } catch (Exception e) {
                 if (e instanceof RuntimeException) {
