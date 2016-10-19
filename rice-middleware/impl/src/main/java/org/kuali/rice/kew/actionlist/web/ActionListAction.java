@@ -886,8 +886,10 @@ System.out.println("Collections.sort done");
                     return 1;
                 }
                 if (property1 instanceof Comparable) {
+System.out.println("\n\nIsComparable: property1=" + property1);                    
                     return ((Comparable)property1).compareTo(property2);
                 }
+System.out.println("\n\nNotComparable: property1=" + property1 + ", property2=" + property2);
                 return property1.toString().compareTo(property2.toString());
             } catch (Exception e) {
                 if (e instanceof RuntimeException) {
