@@ -58,10 +58,10 @@
         p:forceUppercase="false"
         p:label="Principal Name"
         p:shortLabel="Principal Name"
-        p:maxLength="40"
+        p:maxLength="100"
         p:required="true" >
     <property name="validationPattern" >
-      <bean parent="AlphaNumericValidationPattern" p:lowerCase="true" />
+      <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="false"/>
     </property>
     <property name="control" >
       <bean parent="TextControlDefinition" p:size="10" />

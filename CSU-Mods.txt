@@ -1,0 +1,5 @@
+The following Files contain CSU modifications:
+
+\rice-middleware\impl\src\main\java\org\kuali\rice\kim\service\impl\UiDocumentServiceImpl.java
+\rice\rice-middleware\web\src\main\webapp\WEB-INF\tags\kr\page.tag
+\rice\rice-middleware\impl\src\main\resources\org\kuali\rice\kim\bo\datadictionary\KimBaseBeans.xml

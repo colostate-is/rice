@@ -11,3 +11,9 @@ velocity.log
 .settings            
 .classpath           
 .project             
+
+# VS Code
+.vscode
+*.class
+**/bin/
+

@@ -1889,29 +1889,33 @@ public class UiDocumentServiceImpl implements UiDocumentService {
 		return documentRolePermissions;
 	}
 
+	
+	// CSU KFS-370  Role update document was deleting modified members
 	@Override
 	public void setMembersInDocument(IdentityManagementRoleDocument identityManagementRoleDocument){
-		RoleBo roleBo = getDataObjectService().find(RoleBo.class, identityManagementRoleDocument.getRoleId());
-		List<RoleMemberBo> members = roleBo.getMembers();
-		List<RoleMemberBo> membersToRemove = new ArrayList<RoleMemberBo>();
-		boolean found = false;
-		for(KimDocumentRoleMember modifiedMember : identityManagementRoleDocument.getModifiedMembers() ) {
-			for(RoleMemberBo member : members) {
-				if (modifiedMember.getRoleMemberId().equals(member.getId())) {
-					membersToRemove.add(member);
-					found = true;
-				}
-				if (found) {
-					break;
-				}
-			}
-		}
-		for(RoleMemberBo memberToRemove : membersToRemove ) {
-			members.remove(memberToRemove);
-		}
+		if (identityManagementRoleDocument.isEditing()) {
+            RoleBo roleBo = getDataObjectService().find(RoleBo.class, identityManagementRoleDocument.getRoleId());
+            List<RoleMemberBo> members = roleBo.getMembers();
+            List<RoleMemberBo> membersToRemove = new ArrayList<RoleMemberBo>();
+            boolean found = false;
+            for(KimDocumentRoleMember modifiedMember : identityManagementRoleDocument.getModifiedMembers() ) {
+                for(RoleMemberBo member : members) {
+                    if (modifiedMember.getRoleMemberId().equals(member.getId())) {
+                        membersToRemove.add(member);
+                        found = true;
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+            }
+            for(RoleMemberBo memberToRemove : membersToRemove ) {
+                members.remove(memberToRemove);
+            }
 
-		identityManagementRoleDocument.setMembers(loadRoleMembers(identityManagementRoleDocument, members));
-		loadMemberRoleRspActions(identityManagementRoleDocument);
+            identityManagementRoleDocument.setMembers(loadRoleMembers(identityManagementRoleDocument, members));
+            loadMemberRoleRspActions(identityManagementRoleDocument);
+        }	
 	}
 
 	public Map<String, Group> findGroupsForRole(final String roleId) {
