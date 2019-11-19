@@ -182,8 +182,15 @@
     <c:if
             test="${!empty preferences.refreshRate && preferences.refreshRate != 0}">
         <c:if test="${!noRefresh}">
+        	<%-- CSU CW-4112536 ActionList cascading --%>
+ 			<%-- BEGIN UCI CODE KFS-305 pass in extra parameters --%>
+            <c:url value="ActionList.do" var="metaRefreshURL">
+        	    <c:param name="documentTargetSpec" value="${ActionListForm.documentTargetSpec}" />
+                <c:param name="routeLogTargetSpec" value="${ActionListForm.routeLogTargetSpec}" />
+            </c:url>
             <META HTTP-EQUIV="Refresh"
                   CONTENT="<c:out value="${preferences.refreshRate * 60}"/>; URL=ActionList.do">
+            <%-- END UCI CODE KFS-305 pass in extra parameters --%>        
         </c:if>
     </c:if>
     <html-el:form action="ActionList">
