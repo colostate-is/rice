@@ -107,9 +107,13 @@ public class RouteHeaderServiceImpl implements RouteHeaderService {
         try {
             // before saving, copy off the document content, since it's transient it will get erased during a JPA merge
             DocumentRouteHeaderValueContent content = routeHeader.getDocumentContent();
+	    LOG.error("Before Save"); 	
+	    LOG.error(content);	
             DocumentRouteHeaderValue drvPersisted = dataObjectService.save(routeHeader, PersistenceOption.FLUSH);
             // now let's save the content and reattach it to our document
             content.setDocumentId(drvPersisted.getDocumentId());
+	    LOG.error("After 1st save"); 	
+	    LOG.error(content);	
             content = dataObjectService.save(content);
             drvPersisted.setDocumentContent(content);
             return drvPersisted;
